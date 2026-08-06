@@ -191,8 +191,10 @@ Action:       SETTLE NO — Fed held rates confirmed
 | Verified | Sourcify ✅ Blockscout ✅ Routescan ✅ |
 
 ---
+## Hackathon Submission — Tracks Entered
 
-## Prize Tracks
+Submitted to the following Chainlink hackathon prize tracks. Amounts shown are the
+published track prizes, not winnings. Result: did not place.
 
 | Track | Amount | Qualification |
 |-------|--------|---------------|
@@ -201,7 +203,6 @@ Action:       SETTLE NO — Fed held rates confirmed
 | CRE & AI | $17,000 | 3 production CRE workflows running on DON |
 | Risk & Compliance | $16,000 | FBA blocks unsafe settlements — human review triggered |
 | DeFi | $16,000 | hyperliquid_mcp — DEX intelligence via confidential HTTP |
-| **Total** | **$81,000** | |
 
 ---
 
