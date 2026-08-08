@@ -1,6 +1,6 @@
 # Chainlink Prediction Settler
 
-[![CI](https://github.com/tenalirama2025-creator/chainlink-prediction-settler/actions/workflows/rust.yml/badge.svg)](https://github.com/tenalirama2025-creator/chainlink-prediction-settler/actions)
+[![CI](https://github.com/tenalirama2005/chainlink-prediction-settler/actions/workflows/rust.yml/badge.svg)](https://github.com/tenalirama2005/chainlink-prediction-settler/actions)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.19-363636?logo=solidity)](contracts/PredictionMarket.sol)
 [![Rust](https://img.shields.io/badge/Rust-1.75-orange?logo=rust)](settler/)
 [![Chainlink CRE](https://img.shields.io/badge/Chainlink-CRE-375BD2?logo=chainlink)](workflow/)
@@ -39,7 +39,7 @@ bun x cre-setup
 
 **4. Clone and build:**
 ```powershell
-git clone https://github.com/tenalirama2025-creator/chainlink-prediction-settler
+git clone https://github.com/tenalirama2005/chainlink-prediction-settler
 cd chainlink-prediction-settler
 cargo build
 ```
@@ -229,7 +229,7 @@ chainlink-prediction-settler/
 
 - 📝 Blog: [How I Built 3 Chainlink CRE Workflows in One Week](https://dev.to/tenalirama2025/how-i-built-3-chainlink-cre-workflows-in-one-week-fba-oracle-privacy-payroll-defi-4nha)
 - 🎬 Demo: [Chainlink-Prediction-Settler](https://youtu.be/YD14xtCYnM0)
-- 🐙 GitHub: [tenalirama2025-creator](https://github.com/tenalirama2025-creator)
+- 🐙 GitHub: [tenalirama2005](https://github.com/tenalirama2005)
 - 📧 tenalirama2019@gmail.com
 
 ---

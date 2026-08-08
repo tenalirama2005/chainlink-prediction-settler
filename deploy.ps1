@@ -1,7 +1,7 @@
 # =============================================================================
 # Chainlink Prediction Settler — Deploy & Run Script
 # Author: Venkateshwar Rao Nagala
-# GitHub: https://github.com/tenalirama2025-creator/chainlink-prediction-settler
+# GitHub: https://github.com/tenalirama2005/chainlink-prediction-settler
 # =============================================================================
 
 Write-Host ""
@@ -36,7 +36,17 @@ $choice = Read-Host "Enter option (1-9)"
 
 $CONTRACT = "0xEA856dF995C58DEc18221C907DC221c4487Ae499"
 $STATEMENT = "The Federal Open Market Committee decided to maintain the target range for the federal funds rate at 4-1/4 to 4-1/2 percent."
+$SETTLER = if ($env:CARGO_TARGET_DIR) {
+    Join-Path $env:CARGO_TARGET_DIR "debug\settler.exe"
+} else {
+    ".\settler\target\debug\settler.exe"
+}
 
+if (-not (Test-Path $SETTLER)) {
+    Write-Host "❌ settler binary not found at $SETTLER" -ForegroundColor Red
+    Write-Host "   Build it with: cargo build --manifest-path settler/Cargo.toml" -ForegroundColor Yellow
+    exit 1
+}
 # =============================================================================
 # OPTION 1 — SIMULATE FBA CONSENSUS (FREE)
 # =============================================================================
@@ -45,9 +55,13 @@ if ($choice -eq "1") {
     Write-Host ""
     Write-Host "▶ Running FBA Consensus Simulation (FREE mode)..." -ForegroundColor Green
     Write-Host ""
-    D:\cargo_target\debug\settler simulate --statement $STATEMENT
-    Write-Host ""
+    & $SETTLER simulate --statement $STATEMENT
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Simulation failed (exit $LASTEXITCODE)" -ForegroundColor Red
+    } else {
     Write-Host "✅ Simulation complete!" -ForegroundColor Green
+    }
+    Write-Host ""    
 }
 
 # =============================================================================
@@ -71,10 +85,14 @@ elseif ($choice -eq "2") {
     Write-Host "  '$STATEMENT'" -ForegroundColor White
     Write-Host ""
     
-    D:\cargo_target\debug\settler fba --statement $STATEMENT --live
-    
-    Write-Host ""
+    & $SETTLER fba --statement $STATEMENT --live
+    if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Live FBA consensus failed (exit $LASTEXITCODE)" -ForegroundColor Red
+    } else {
     Write-Host "✅ Live FBA consensus complete!" -ForegroundColor Green
+    }
+    
+    Write-Host ""    
 }
 
 # =============================================================================
@@ -82,6 +100,9 @@ elseif ($choice -eq "2") {
 # =============================================================================
 
 elseif ($choice -eq "3") {
+    if (-not (Get-Command cre -ErrorAction SilentlyContinue)) {
+    Write-Host "❌ CRE CLI not found. Install with: bun x cre-setup" -ForegroundColor Red
+    return}
     Write-Host ""
     Write-Host "▶ Running ALL 3 CRE Workflow Simulations..." -ForegroundColor Cyan
     Write-Host ""
@@ -92,7 +113,8 @@ elseif ($choice -eq "3") {
     Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Gray
     Set-Location workflow\payroll_mcp
     $env:PAYROLL_API_KEY_VALUE = "dev-api-key"
-    cre workflow simulate . --target staging-settings
+    cre workflow simulate . --target staging-settings    
+    $payrollOk = ($LASTEXITCODE -eq 0)
     Set-Location ..\..
     Write-Host ""
 
@@ -101,7 +123,8 @@ elseif ($choice -eq "3") {
     Write-Host "  [2/3] hyperliquid_mcp — DeFi Market Intelligence" -ForegroundColor Green
     Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Gray
     Set-Location workflow\hyperliquid_mcp
-    cre workflow simulate . --target staging-settings
+    cre workflow simulate . --target staging-settings    
+    $hyperliquidOk = ($LASTEXITCODE -eq 0)
     Set-Location ..\..
     Write-Host ""
 
@@ -113,10 +136,20 @@ elseif ($choice -eq "3") {
     $env:CLAUDE_API_KEY_VALUE = "dev-api-key"
     $env:OPENAI_API_KEY_VALUE = "dev-api-key"
     cre workflow simulate . --target staging-settings
+    $aiPredictionOk = ($LASTEXITCODE -eq 0)    
     Set-Location ..\..
     Write-Host ""
 
+    $failed = @()
+    if (-not $payrollOk)      { $failed += "payroll_mcp" }
+    if (-not $hyperliquidOk)  { $failed += "hyperliquid_mcp" }
+    if (-not $aiPredictionOk) { $failed += "ai_prediction_mcp" }
+
+    if ($failed.Count -eq 0) {
     Write-Host "✅ All 3 CRE simulations complete!" -ForegroundColor Green
+    } else {
+    Write-Host "❌ Failed: $($failed -join ', ')" -ForegroundColor Red
+    }
 }
 
 # =============================================================================
@@ -131,7 +164,11 @@ elseif ($choice -eq "4") {
     cre workflow simulate . --target staging-settings
     Set-Location ..\..
     Write-Host ""
+    if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ payroll_mcp simulation failed (exit $LASTEXITCODE)" -ForegroundColor Red
+    } else {
     Write-Host "✅ payroll_mcp simulation complete!" -ForegroundColor Green
+    }
 }
 
 # =============================================================================
@@ -145,7 +182,11 @@ elseif ($choice -eq "5") {
     cre workflow simulate . --target staging-settings
     Set-Location ..\..
     Write-Host ""
+    if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ hyperliquid_mcp failed (exit $LASTEXITCODE)" -ForegroundColor Red
+    } else {
     Write-Host "✅ hyperliquid_mcp complete — live prices fetched!" -ForegroundColor Green
+    }    
 }
 
 # =============================================================================
@@ -161,7 +202,11 @@ elseif ($choice -eq "6") {
     cre workflow simulate . --target staging-settings
     Set-Location ..\..
     Write-Host ""
+    if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ ai_prediction_mcp simulation failed (exit $LASTEXITCODE)" -ForegroundColor Red
+    } else {
     Write-Host "✅ ai_prediction_mcp simulation complete!" -ForegroundColor Green
+    }    
 }
 
 # =============================================================================
@@ -172,7 +217,9 @@ elseif ($choice -eq "7") {
     Write-Host ""
     Write-Host "▶ Checking PredictionMarket contract status..." -ForegroundColor Green
     Write-Host ""
-    D:\cargo_target\debug\settler status --market $CONTRACT
+    & $SETTLER status --market $CONTRACT
+    if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Contract status check failed (exit $LASTEXITCODE)" -ForegroundColor Red    }
     Write-Host ""
     Write-Host "🔗 View on Blockscout:" -ForegroundColor Cyan
     Write-Host "   https://eth-sepolia.blockscout.com/address/$CONTRACT" -ForegroundColor Cyan
